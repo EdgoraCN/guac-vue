@@ -8,6 +8,11 @@ module.exports = {
         changeOrigin: true,
         ws: false
       },
+      '/config': {
+        target: guacClient,
+        changeOrigin: true,
+        ws: false
+      },
       '/websocket-tunnel': {
         target: guacClient,
         changeOrigin: true,

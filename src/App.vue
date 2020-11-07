@@ -5,10 +5,24 @@
                  src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149"
                  class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
         </a>
+          
         <div id="app" v-if="!connect">
-            <h1>Vue Guacamole client example</h1>
+          <h1>Connect via server side configuration id </h1>
+            <div class="field">
+                <label for="scheme">Configration ID</label>
+                <select v-model="selectId">
+                  <option v-for="id in ids" :value="id" :key="id">{{ id }}</option>
+                </select>
+            </div>
+            <div class="center">
+                <button class="connect" @click="doConnectById()">Connect</button>
+            </div>
+            <h1>Connect via paramters </h1>
             <p>Enter connection information to connect</p>
-
+            <div class="field">
+                <label for="scheme">ID</label>
+                <input type="text" v-model="id" id="id" placeholder="Configration ID">
+            </div>
             <div class="field">
                 <label for="scheme">Scheme/Protocol</label>
                 <input type="text" v-model="scheme" id="scheme">
@@ -56,6 +70,11 @@
                 <span><input type="checkbox" v-model="forceHttp" id="forcehttp"></span>
             </div>
 
+             <div class="field">
+                <label for="forcehttp">GUACD Server</label>
+                <input type="text" v-model="guacd" id="nla" placeholder="the custom CUACD server">
+            </div>
+
             <div class="center">
                 <button class="connect" @click="doConnect()">Connect</button>
             </div>
@@ -75,15 +94,19 @@
     data() {
       return {
         connect: false,
-
-        scheme: 'telnet',
-        hostname: 'towel.blinkenlights.nl',
-        port: '',
+        scheme: 'ssh',
+        hostname: '127.0.0.1',
+        port: '22',
         user: '',
         pass: '',
         ignoreCert: true,
         security: '',
         forceHttp: false,
+        guacd: '',
+        id: '',
+        ids:[],
+        selectId:'',
+        useId: false
       }
     },
     computed: {
@@ -95,14 +118,20 @@
           'ignore-cert': this.ignoreCert,
           security: this.security,
           username: this.user,
-          password: this.pass
+          password: this.pass,
+          guacd: this.guacd,
+          id: this.id
         }
       },
       query() {
         const queryString = []
-        for (const [k, v] of Object.entries(this.queryObj)) {
-          if (v) {
-            queryString.push(`${k}=${encodeURIComponent(v)}`)
+        if(this.useId){
+          queryString.push(`id=${encodeURIComponent(this.selectId)}`)
+        }else {
+          for (const [k, v] of Object.entries(this.queryObj)) {
+            if (v) {
+              queryString.push(`${k}=${encodeURIComponent(v)}`)
+            }
           }
         }
         return queryString.join("&")
@@ -116,7 +145,23 @@
         if (window.localStorage) {
           window.localStorage.setItem('query', JSON.stringify(this.queryObj))
         }
+        this.useId = false;
         this.connect = true
+      },
+      doConnectById(){
+        if(!this.selectId){
+          alert("please Select one Congration ID");
+          return;
+        }
+        this.useId = true;
+        this.connect = true
+      },
+      async readIds () {
+        const response = await this.$http.get('/config?ids=all');
+        this.ids = response.data;
+        if(this.ids&&this.ids.length>0){
+          this.selectId = this.ids[0]
+        }
       }
     },
     mounted() {
@@ -136,6 +181,7 @@
         this.user = query.username
         this.pass = query.password
       }
+      this.readIds();
     }
   }
 </script>
