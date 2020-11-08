@@ -1,8 +1,8 @@
 <template>
     <div class="container">
-        <a style="position: fixed;" href="https://github.com/wwt/guac-vue">
+        <a style="position: fixed;" href="https://github.com/EdgoraCN/guac-vue">
             <img width="149" height="149"
-                 src="https://github.blog/wp-content/uploads/2008/12/forkme_left_red_aa0000.png?resize=149%2C149"
+                 src="@/assets/forkme.png"
                  class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1">
         </a>
           
@@ -25,7 +25,9 @@
             </div>
             <div class="field">
                 <label for="scheme">Scheme/Protocol</label>
-                <input type="text" v-model="scheme" id="scheme">
+                <select v-model="scheme" id="scheme">
+                  <option v-for="sc in schemes" :value="sc.value" :key="sc.value">{{ sc.text }}</option>
+                </select>
             </div>
 
             <div class="field">
@@ -72,7 +74,12 @@
 
              <div class="field">
                 <label for="forcehttp">GUACD Server</label>
-                <input type="text" v-model="guacd" id="nla" placeholder="the custom CUACD server">
+                <input type="text" v-model="guacd" id="guacd" placeholder="the custom CUACD server">
+            </div>
+
+            <div class="field">
+                <label for="forcehttp">Allowed Users</label>
+                <input type="text" v-model="access" id="access" placeholder="Usernames split with comma, leave this empty to allow all">
             </div>
 
             <div class="center">
@@ -103,10 +110,12 @@
         security: '',
         forceHttp: false,
         guacd: '',
+        access: '',
         id: '',
         ids:[],
         selectId:'',
-        useId: false
+        useId: false,
+        schemes:[{text:"SSH",value:"ssh"},{text:"RDP",value:"rdp"},{text:"VNC",value:"vnc"},{text:"Telnet",value:"telnet"},{text:"Kubernetes",value:"kubernetes"}]
       }
     },
     computed: {
@@ -120,7 +129,8 @@
           username: this.user,
           password: this.pass,
           guacd: this.guacd,
-          id: this.id
+          id: this.id,
+          access: this.access
         }
       },
       query() {
