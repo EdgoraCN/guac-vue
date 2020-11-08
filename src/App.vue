@@ -235,7 +235,7 @@
         content: ': '
     }
 
-    input {
+    input,select {
         margin-left: 1rem;
         margin-right: 1rem;
         font-size: 16pt;
