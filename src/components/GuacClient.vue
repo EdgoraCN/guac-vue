@@ -14,9 +14,9 @@
   import Modal from '@/components/Modal'
 
   Guacamole.Mouse = GuacMouse.mouse
-
-  const wsUrl = `ws://${location.host}/websocket-tunnel`
-  const httpUrl = `http://${location.host}/tunnel`
+  var scheme = (location.protocol === 'https'? 'wss':'ws')
+  const wsUrl = `${scheme}://${location.host}/websocket-tunnel`
+  const httpUrl = `${location.protocol}://${location.host}/tunnel`
 
   export default {
     components: {
